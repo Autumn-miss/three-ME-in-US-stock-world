@@ -22,6 +22,7 @@ This repository is for simulation, observation, and research. It is not investme
 - Real-data-first design: the default run fails explicitly if real quotes cannot be fetched
 - Recent strategy emphasis: the dashboard highlights the latest 5 trading days and collapses older history
 - Local-first setup: runs on your own machine with a SQLite database and Streamlit UI
+- Language toggle: switch dashboard content between `English`, `Bilingual`, and `Chinese`
 
 ## How It Works
 
@@ -44,7 +45,7 @@ The repository homepage shows the English project summary, setup instructions, a
 
 ![Strategy dashboard](assets/screenshots/strategy-dashboard.png)
 
-This strategy view shows the English page title, top navigation, persona ranking cards, and a bilingual strategy section entry point.
+This strategy view shows the English page title, top navigation, persona ranking cards, and a strategy section that can switch between English, bilingual, and Chinese display.
 
 ### Returns Dashboard
 

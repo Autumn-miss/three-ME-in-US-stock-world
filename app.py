@@ -288,6 +288,33 @@ TRANSLATION_REPLACEMENTS = [
     ("卖出数量超过当前持仓，禁止做空。", "Sell quantity exceeds the current position; short selling is not allowed."),
 ]
 
+TRANSLATION_PATTERNS: list[tuple[re.Pattern[str], str | callable]] = [
+    (
+        re.compile(r"质量型组合补充\s+([A-Z.]+)，兼顾大盘稳定性与估值纪律。"),
+        lambda m: f"Quality & Stability adds {m.group(1)}, balancing large-cap stability and valuation discipline.",
+    ),
+    (
+        re.compile(r"成长动量型追踪强势趋势，\s*([A-Z.]+)\s*今日动量和 AI 相关度较突出。"),
+        lambda m: f"Growth & Momentum tracks a strong trend in {m.group(1)} because today's momentum and AI relevance stand out.",
+    ),
+    (
+        re.compile(r"成长动量型给\s*([A-Z.]+)\s*设置风控卖出计划。"),
+        lambda m: f"Growth & Momentum sets a risk-control sell plan for {m.group(1)}.",
+    ),
+    (
+        re.compile(r"逆向价值型等待\s*([A-Z.]+)\s*回落到更舒服的价格再接。"),
+        lambda m: f"Contrarian Value waits for {m.group(1)} to pull back to a more comfortable entry price.",
+    ),
+    (
+        re.compile(r"逆向价值型计划在\s*([A-Z.]+)\s*反弹后兑现部分修复收益。"),
+        lambda m: f"Contrarian Value plans to realize part of the recovery gain in {m.group(1)} after a rebound.",
+    ),
+    (
+        re.compile(r"质量型对\s*([A-Z.]+)\s*做纪律性减仓，\s*当前持仓收益\s*([+\-]?\d+\.\d+%)。"),
+        lambda m: f"Quality & Stability trims {m.group(1)} under discipline, with the current holding return at {m.group(2)}.",
+    ),
+]
+
 
 def translate_chinese_text(text: object) -> str:
     source = str(text or "").strip()
@@ -295,6 +322,8 @@ def translate_chinese_text(text: object) -> str:
         return "-"
 
     translated = source
+    for pattern, replacement in TRANSLATION_PATTERNS:
+        translated = pattern.sub(replacement, translated)
     for original, replacement in TRANSLATION_REPLACEMENTS:
         translated = translated.replace(original, replacement)
 
@@ -310,22 +339,31 @@ def translate_chinese_text(text: object) -> str:
     return translated
 
 
-def bilingual_plain_text(value: object) -> str:
-    if pd.isna(value):
-        return "-"
-    original = str(value or "").strip()
-    if not original:
-        return "-"
-    return f"EN: {translate_chinese_text(original)}\nZH: {original}"
-
-
-def bilingual_html_text(value: object) -> str:
+def plain_text_for_mode(value: object, language_mode: str) -> str:
     if pd.isna(value):
         return "-"
     original = str(value or "").strip()
     if not original:
         return "-"
     english = translate_chinese_text(original)
+    if language_mode == "English":
+        return english
+    if language_mode == "Chinese":
+        return original
+    return f"EN: {english}\nZH: {original}"
+
+
+def html_text_for_mode(value: object, language_mode: str) -> str:
+    if pd.isna(value):
+        return "-"
+    original = str(value or "").strip()
+    if not original:
+        return "-"
+    english = translate_chinese_text(original)
+    if language_mode == "English":
+        return escape(english).replace("\n", "<br>")
+    if language_mode == "Chinese":
+        return escape(original).replace("\n", "<br>")
     return (
         f"<strong>EN:</strong> {escape(english).replace(chr(10), '<br>')}"
         "<br>"
@@ -671,19 +709,20 @@ def strategy_cell(
     report_row: pd.Series | None,
     orders_df: pd.DataFrame,
     trades_df: pd.DataFrame,
+    language_mode: str,
 ) -> str:
     if report_row is None:
         return "-"
     sections = parse_strategy_sections(str(report_row["analysis"]))
     if label == "我看到的市场":
-        return bilingual_html_text(report_row["market_summary"])
+        return html_text_for_mode(report_row["market_summary"], language_mode)
     if label == "今日行动":
-        return bilingual_html_text(report_row["plan_text"])
+        return html_text_for_mode(report_row["plan_text"], language_mode)
     if label == "行动":
-        return bilingual_html_text(action_text_for_date(persona_id, report_date, orders_df, trades_df))
+        return html_text_for_mode(action_text_for_date(persona_id, report_date, orders_df, trades_df), language_mode)
     if label == "复盘":
-        return bilingual_html_text(report_row["review"])
-    return bilingual_html_text(sections.get(label, ""))
+        return html_text_for_mode(report_row["review"], language_mode)
+    return html_text_for_mode(sections.get(label, ""), language_mode)
 
 
 def render_strategy_matrix(
@@ -692,6 +731,7 @@ def render_strategy_matrix(
     reports_df: pd.DataFrame,
     orders_df: pd.DataFrame,
     trades_df: pd.DataFrame,
+    language_mode: str,
 ) -> None:
     persona_reports = reports_df[reports_df["persona_id"] == persona["id"]].set_index("date")
     report_dates = five_day_window(report_dates)
@@ -706,7 +746,7 @@ def render_strategy_matrix(
             report_row = persona_reports.loc[report_date] if report_date in persona_reports.index else None
             cells.append(
                 "<td class=\"day-cell\">"
-                + strategy_cell(str(persona["id"]), report_date, label, report_row, orders_df, trades_df)
+                + strategy_cell(str(persona["id"]), report_date, label, report_row, orders_df, trades_df, language_mode)
                 + "</td>"
             )
         body_rows.append(f"<tr><td class=\"row-label\">{escape(STRATEGY_ROW_MAP.get(label, label))}</td>{''.join(cells)}</tr>")
@@ -759,6 +799,12 @@ latest_prices = data["prices"]
 
 st.title("Virtual US Stock World")
 st.caption("Three simulated investors, each starting with USD 20,000. Virtual trading only, for observation and research.")
+language_mode = st.radio(
+    "Display Language",
+    ["English", "Bilingual", "Chinese"],
+    index=0,
+    horizontal=True,
+)
 
 if not price_sources.empty:
     sources = ", ".join(
@@ -838,8 +884,8 @@ with tabs[3]:
         st.info("No orders yet.")
     else:
         order_view = orders.merge(personas, left_on="persona_id", right_on="id")
-        order_view["reason"] = order_view["reason"].map(bilingual_plain_text)
-        order_view["miss_reason"] = order_view["miss_reason"].map(bilingual_plain_text)
+        order_view["reason"] = order_view["reason"].map(lambda value: plain_text_for_mode(value, language_mode))
+        order_view["miss_reason"] = order_view["miss_reason"].map(lambda value: plain_text_for_mode(value, language_mode))
         st.dataframe(
             order_view.rename(
                 columns={
@@ -866,7 +912,7 @@ with tabs[3]:
         st.info("No trades yet.")
     else:
         trade_view = trades.merge(personas, left_on="persona_id", right_on="id")
-        trade_view["reason"] = trade_view["reason"].map(bilingual_plain_text)
+        trade_view["reason"] = trade_view["reason"].map(lambda value: plain_text_for_mode(value, language_mode))
         st.dataframe(
             trade_view.rename(
                 columns={
@@ -925,7 +971,7 @@ with tabs[5]:
             "while older strategy history stays collapsed into 5-day windows."
         )
         for _, persona in personas.iterrows():
-            render_strategy_matrix(persona, recent_dates, reports, orders, trades)
+            render_strategy_matrix(persona, recent_dates, reports, orders, trades, language_mode)
         if older_date_windows:
             with st.expander("Historical Strategy Windows", expanded=False):
                 for history_dates in older_date_windows:
@@ -933,4 +979,4 @@ with tabs[5]:
                     end_date = history_dates[-1]
                     with st.expander(f"{start_date} to {end_date}", expanded=False):
                         for _, persona in personas.iterrows():
-                            render_strategy_matrix(persona, history_dates, reports, orders, trades)
+                            render_strategy_matrix(persona, history_dates, reports, orders, trades, language_mode)
