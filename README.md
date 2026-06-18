@@ -110,3 +110,7 @@ By default, the project uses only real daily market data. If real quotes cannot 
 - The repository is public and open to suggestions, issues, and pull requests
 - The local database, logs, and secrets are intentionally excluded from Git tracking
 - When real Yahoo Finance data is unavailable, the default behavior is to fail rather than hide the problem
+
+## License
+
+This project is released under the MIT License. See `LICENSE` for details.
