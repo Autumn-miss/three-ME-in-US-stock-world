@@ -1,7 +1,8 @@
 #!/bin/zsh
 set -u
 
-PROJECT_DIR="/Users/wuying/Documents/虚拟炒股梦想家"
+SCRIPT_DIR="$(cd -- "$(dirname -- "$0")" && pwd)"
+PROJECT_DIR="$SCRIPT_DIR"
 URL="http://localhost:8501"
 LOG_DIR="$PROJECT_DIR/logs"
 STREAMLIT_LOG="$LOG_DIR/streamlit.log"
