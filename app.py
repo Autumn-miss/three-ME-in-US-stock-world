@@ -216,6 +216,21 @@ PERSONA_STYLE_MAP = {
     "逆向与估值修复": "Contrarian and Valuation Reversion",
 }
 
+STRATEGY_ROW_MAP = {
+    "策略原则": "Strategy Principle",
+    "我看到的市场": "What I See in the Market",
+    "证据清单": "Evidence List",
+    "当前组合": "Current Portfolio",
+    "我的解释": "My Interpretation",
+    "候选规则": "Candidate Rules",
+    "买入规则": "Buy Rules",
+    "卖出规则": "Sell Rules",
+    "主要风险": "Key Risks",
+    "今日行动": "Today's Plan",
+    "行动": "Orders and Executions",
+    "复盘": "Review",
+}
+
 POSITION_COLUMNS = ["Persona", "Ticker", "Company (Sector)", "AI Tags", "Total Shares", "Cost Basis", "Last Price", "Market Value", "Unrealized P&L"]
 
 
@@ -468,17 +483,19 @@ def action_text_for_date(persona_id: str, day: str, orders_df: pd.DataFrame, tra
     if not trades_df.empty:
         day_trades = trades_df[(trades_df["persona_id"] == persona_id) & (trades_df["trade_date"] == day)]
         for _, trade in day_trades.iterrows():
-            side = "买入" if trade["side"] == "BUY" else "卖出"
-            lines.append(f"- 已成交：{side} {trade['symbol']} {float(trade['quantity']):.4f} 股，价格 {float(trade['price']):.2f}。")
+            side = "Buy" if trade["side"] == "BUY" else "Sell"
+            lines.append(
+                f"- Executed: {side} {trade['symbol']} {float(trade['quantity']):.4f} shares at {float(trade['price']):.2f}."
+            )
     if not orders_df.empty:
         day_orders = orders_df[(orders_df["persona_id"] == persona_id) & (orders_df["plan_date"] == day)]
         for _, order in day_orders.iterrows():
-            side = "买入" if order["side"] == "BUY" else "卖出"
+            side = "Buy" if order["side"] == "BUY" else "Sell"
             status = order["status"]
             lines.append(
-                f"- 计划订单：{side} {order['symbol']} {float(order['quantity']):.4f} 股，限价 {float(order['limit_price']):.2f}，状态 {status}。"
+                f"- Planned order: {side} {order['symbol']} {float(order['quantity']):.4f} shares, limit {float(order['limit_price']):.2f}, status {status}."
             )
-    return "\n".join(lines) if lines else "- 当日没有成交或新增订单。"
+    return "\n".join(lines) if lines else "- No executions or new orders for this day."
 
 
 STRATEGY_ROWS = [
@@ -526,9 +543,9 @@ def html_text(value: object) -> str:
 
 
 def day_heading(index: int, report_date: str) -> str:
-    names = ["第一交易日", "第二交易日", "第三交易日", "第四交易日", "第五交易日"]
-    label = names[index] if index < len(names) else f"第{index + 1}交易日"
-    date_label = escape(report_date) if report_date else "等待生成"
+    names = ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5"]
+    label = names[index] if index < len(names) else f"Day {index + 1}"
+    date_label = escape(report_date) if report_date else "Waiting"
     return f"{label}<span class=\"day-date\">{date_label}</span>"
 
 
@@ -593,7 +610,7 @@ def render_strategy_matrix(
                 + strategy_cell(str(persona["id"]), report_date, label, report_row, orders_df, trades_df)
                 + "</td>"
             )
-        body_rows.append(f"<tr><td class=\"row-label\">{escape(label)}</td>{''.join(cells)}</tr>")
+        body_rows.append(f"<tr><td class=\"row-label\">{escape(STRATEGY_ROW_MAP.get(label, label))}</td>{''.join(cells)}</tr>")
 
     table_html = (
         '<div class="strategy-matrix-wrap">'
@@ -711,7 +728,7 @@ with tabs[1]:
 
 with tabs[2]:
     if trades.empty:
-        st.info("暂无成交记录。")
+        st.info("No executed trades yet.")
     else:
         ledger, trade_histories = build_position_ledger(trades, personas, symbols, latest_prices)
         render_position_ledger(ledger, trade_histories)
@@ -719,48 +736,48 @@ with tabs[2]:
 with tabs[3]:
     st.subheader("Orders")
     if orders.empty:
-        st.info("暂无订单。")
+        st.info("No orders yet.")
     else:
         order_view = orders.merge(personas, left_on="persona_id", right_on="id")
         st.dataframe(
             order_view.rename(
                 columns={
-                    "name": "虚拟人",
-                    "symbol": "股票",
-                    "side": "方向",
-                    "quantity": "股数",
-                    "limit_price": "计划价",
-                    "status": "状态",
-                    "plan_date": "计划日",
-                    "valid_date": "有效日",
-                    "execution_price": "成交价",
-                    "miss_reason": "未成交原因",
-                    "reason": "理由",
+                    "name": "Persona",
+                    "symbol": "Ticker",
+                    "side": "Side",
+                    "quantity": "Shares",
+                    "limit_price": "Limit Price",
+                    "status": "Status",
+                    "plan_date": "Plan Date",
+                    "valid_date": "Valid Date",
+                    "execution_price": "Execution Price",
+                    "miss_reason": "Miss Reason",
+                    "reason": "Reason",
                 }
             )[
-                ["计划日", "有效日", "虚拟人", "股票", "方向", "股数", "计划价", "状态", "成交价", "未成交原因", "理由"]
+                ["Plan Date", "Valid Date", "Persona", "Ticker", "Side", "Shares", "Limit Price", "Status", "Execution Price", "Miss Reason", "Reason"]
             ],
             width="stretch",
             hide_index=True,
         )
     st.subheader("Trades")
     if trades.empty:
-        st.info("暂无成交。")
+        st.info("No trades yet.")
     else:
         trade_view = trades.merge(personas, left_on="persona_id", right_on="id")
         st.dataframe(
             trade_view.rename(
                 columns={
-                    "trade_date": "成交日",
-                    "name": "虚拟人",
-                    "symbol": "股票",
-                    "side": "方向",
-                    "quantity": "股数",
-                    "price": "价格",
-                    "amount": "金额",
-                    "reason": "理由",
+                    "trade_date": "Trade Date",
+                    "name": "Persona",
+                    "symbol": "Ticker",
+                    "side": "Side",
+                    "quantity": "Shares",
+                    "price": "Price",
+                    "amount": "Amount",
+                    "reason": "Reason",
                 }
-            )[["成交日", "虚拟人", "股票", "方向", "股数", "价格", "金额", "理由"]],
+            )[["Trade Date", "Persona", "Ticker", "Side", "Shares", "Price", "Amount", "Reason"]],
             width="stretch",
             hide_index=True,
         )
@@ -793,7 +810,7 @@ with tabs[4]:
 
 with tabs[5]:
     if reports.empty:
-        st.info("暂无日报。")
+        st.info("No daily reports yet.")
     else:
         dates_desc = sorted(reports["date"].unique(), reverse=True)
         latest_report_date = dates_desc[0]

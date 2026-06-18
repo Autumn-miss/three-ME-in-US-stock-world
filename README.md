@@ -58,6 +58,12 @@ The dashboard UI is being translated progressively into English, starting with t
 
 The holdings view now uses English persona labels, English style names, and fully English field labels for position summaries and trade history.
 
+### Orders and Trades Dashboard
+
+![Orders and trades dashboard](assets/screenshots/orders-dashboard.png)
+
+The orders and trades view now uses English table headers for planned orders, execution records, and status tracking.
+
 ## Quick Start
 
 ```bash
@@ -90,6 +96,14 @@ python3 run_daily.py --reset --demo-days 30 --allow-synthetic
 ```
 
 By default, the project uses only real daily market data. If real quotes cannot be fetched, the run fails explicitly instead of silently falling back to demo prices.
+
+## Demo Flow
+
+1. Run `python3 run_daily.py --reset --demo-days 8` to generate a clean demo dataset.
+2. Start the dashboard with `python3 -m streamlit run app.py`.
+3. Open [http://localhost:8501](http://localhost:8501).
+4. Review the `Overview`, `Returns`, `Holdings`, `Orders & Trades`, and `Strategy` tabs in order.
+5. Run `python3 run_daily.py` again on later days to extend the virtual market timeline.
 
 ## Project Structure
 

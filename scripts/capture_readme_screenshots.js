@@ -47,6 +47,17 @@ async function capture() {
         await page.waitForTimeout(1200);
       },
     },
+    {
+      url: "http://127.0.0.1:8501/",
+      path: "assets/screenshots/orders-dashboard.png",
+      viewport: { width: 1440, height: 1400 },
+      fullPage: false,
+      waitFor: { selector: '[data-testid="stAppViewContainer"]' },
+      afterLoad: async (page) => {
+        await page.getByText("Orders & Trades", { exact: true }).click();
+        await page.waitForTimeout(1200);
+      },
+    },
   ];
 
   for (const pageDef of pages) {
