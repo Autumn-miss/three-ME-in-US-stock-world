@@ -44,7 +44,13 @@ The repository homepage shows the English project summary, setup instructions, a
 
 ![Strategy dashboard](assets/screenshots/strategy-dashboard.png)
 
-This dashboard view highlights the recent 5-trading-day strategy matrix. The current dashboard interface is Chinese-first, while the public-facing GitHub documentation is maintained in English.
+This dashboard view highlights the recent 5-trading-day strategy matrix.
+
+### Returns Dashboard
+
+![Returns dashboard](assets/screenshots/returns-dashboard.png)
+
+The dashboard UI is being translated progressively into English, starting with the page title, top navigation, and key section headers.
 
 ## Quick Start
 

@@ -21,7 +21,18 @@ async function capture() {
       fullPage: false,
       waitFor: { selector: '[data-testid="stAppViewContainer"]' },
       afterLoad: async (page) => {
-        await page.getByText("投资策略", { exact: true }).click();
+        await page.getByText("Strategy", { exact: true }).click();
+        await page.waitForTimeout(1200);
+      },
+    },
+    {
+      url: "http://127.0.0.1:8501/",
+      path: "assets/screenshots/returns-dashboard.png",
+      viewport: { width: 1440, height: 1400 },
+      fullPage: false,
+      waitFor: { selector: '[data-testid="stAppViewContainer"]' },
+      afterLoad: async (page) => {
+        await page.getByText("Returns", { exact: true }).click();
         await page.waitForTimeout(1200);
       },
     },

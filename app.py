@@ -25,7 +25,7 @@ from virtual_trader.db import (
 )
 
 
-st.set_page_config(page_title="虚拟美股投资世界", page_icon="📈", layout="wide")
+st.set_page_config(page_title="Virtual US Stock World", page_icon="📈", layout="wide")
 
 st.markdown(
     """
@@ -626,20 +626,23 @@ ai_symbols = pd.DataFrame(data["ai_symbols"])
 price_sources = pd.DataFrame(data["price_sources"])
 latest_prices = data["prices"]
 
-st.title("虚拟美股投资世界")
-st.caption("3 个虚拟投资人，各自 20,000 美元本金。纯虚拟交易，仅用于观察和研究。")
+st.title("Virtual US Stock World")
+st.caption("Three simulated investors, each starting with USD 20,000. Virtual trading only, for observation and research.")
 
 if not price_sources.empty:
     sources = ", ".join(
-        f"{row.source} ({row.first_date} 至 {row.last_date}, {row.rows} 条)" for row in price_sources.itertuples()
+        f"{row.source} ({row.first_date} to {row.last_date}, {row.rows} rows)" for row in price_sources.itertuples()
     )
     if any(str(source).startswith("synthetic") for source in price_sources["source"]):
-        st.error(f"当前数据库含演示合成行情：{sources}。请运行 `python3 run_daily.py --reset --demo-days 2` 重新拉取真实行情。")
+        st.error(
+            f"The current database includes synthetic demo prices: {sources}. "
+            "Run `python3 run_daily.py --reset --demo-days 2` to rebuild with real market data."
+        )
     else:
-        st.caption(f"行情来源：{sources}")
+        st.caption(f"Market data source: {sources}")
 
 if snapshots.empty:
-    st.info("还没有资产快照。先运行 `python3 run_daily.py --demo-days 8` 生成演示数据。")
+    st.info("No portfolio snapshots yet. Run `python3 run_daily.py --demo-days 8` to generate demo data first.")
     st.stop()
 
 latest_date = snapshots["date"].max()
@@ -655,27 +658,27 @@ for idx, row in latest.sort_values("total_value", ascending=False).reset_index(d
             f"${row['total_value']:,.2f}",
             f"{row['cumulative_return'] * 100:.2f}%",
         )
-        st.caption(f"现金 ${row['cash']:,.2f} · 回撤 {row['drawdown'] * 100:.2f}%")
+        st.caption(f"Cash ${row['cash']:,.2f} · Drawdown {row['drawdown'] * 100:.2f}%")
 
-tabs = st.tabs(["总览", "收益曲线", "持仓", "订单与交易", "AI 产业链", "投资策略"])
+tabs = st.tabs(["Overview", "Returns", "Holdings", "Orders & Trades", "AI Watchlist", "Strategy"])
 
 with tabs[0]:
-    st.subheader(f"{latest_date} 排名")
+    st.subheader(f"{latest_date} Rankings")
     ranking = latest[
         ["name", "style", "cash", "positions_value", "total_value", "cumulative_return", "drawdown"]
     ].sort_values("total_value", ascending=False)
-    ranking["收益率"] = (ranking["cumulative_return"] * 100).map(lambda v: f"{v:.2f}%")
-    ranking["回撤"] = (ranking["drawdown"] * 100).map(lambda v: f"{v:.2f}%")
+    ranking["Return"] = (ranking["cumulative_return"] * 100).map(lambda v: f"{v:.2f}%")
+    ranking["Drawdown"] = (ranking["drawdown"] * 100).map(lambda v: f"{v:.2f}%")
     st.dataframe(
         ranking.rename(
             columns={
-                "name": "虚拟人",
-                "style": "风格",
-                "cash": "现金",
-                "positions_value": "持仓市值",
-                "total_value": "总资产",
+                "name": "Persona",
+                "style": "Style",
+                "cash": "Cash",
+                "positions_value": "Positions Value",
+                "total_value": "Total Value",
             }
-        )[["虚拟人", "风格", "现金", "持仓市值", "总资产", "收益率", "回撤"]],
+        )[["Persona", "Style", "Cash", "Positions Value", "Total Value", "Return", "Drawdown"]],
         width="stretch",
         hide_index=True,
     )
@@ -683,11 +686,11 @@ with tabs[0]:
 with tabs[1]:
     chart_data = snapshots.merge(personas, left_on="persona_id", right_on="id", suffixes=("", "_persona"))
     st.plotly_chart(
-        px.line(chart_data, x="date", y="total_value", color="name", markers=True, title="资产净值"),
+        px.line(chart_data, x="date", y="total_value", color="name", markers=True, title="Portfolio Value"),
         width="stretch",
     )
     st.plotly_chart(
-        px.line(chart_data, x="date", y="cumulative_return", color="name", markers=True, title="累计收益率"),
+        px.line(chart_data, x="date", y="cumulative_return", color="name", markers=True, title="Cumulative Return"),
         width="stretch",
     )
 
@@ -699,7 +702,7 @@ with tabs[2]:
         render_position_ledger(ledger, trade_histories)
 
 with tabs[3]:
-    st.subheader("订单")
+    st.subheader("Orders")
     if orders.empty:
         st.info("暂无订单。")
     else:
@@ -725,7 +728,7 @@ with tabs[3]:
             width="stretch",
             hide_index=True,
         )
-    st.subheader("成交")
+    st.subheader("Trades")
     if trades.empty:
         st.info("暂无成交。")
     else:
@@ -748,7 +751,7 @@ with tabs[3]:
         )
 
 with tabs[4]:
-    st.subheader("AI 产业链股票池")
+    st.subheader("AI Watchlist")
     ai_symbol_view = ai_symbols.rename(
         columns={"symbol": "股票", "name": "公司", "sector": "板块", "ai_tags": "AI 标签"}
     )[["股票", "公司", "板块", "AI 标签"]]
@@ -767,9 +770,9 @@ with tabs[4]:
     if not positions.empty:
         ai_positions = positions[positions["ai_tags"].fillna("") != ""]
         if ai_positions.empty:
-            st.info("当前三位虚拟人还没有 AI 标签持仓。")
+            st.info("None of the three personas currently holds AI-tagged positions.")
         else:
-            st.subheader("AI 持仓")
+            st.subheader("AI Holdings")
             ai_position_view = build_position_view(ai_positions, personas, symbols)
             render_position_cards(ai_position_view)
 
@@ -781,18 +784,19 @@ with tabs[5]:
         latest_report_date = dates_desc[0]
         recent_dates = sorted(dates_desc[:5])
         older_date_windows = historical_windows(dates_desc)
-        st.subheader("最近 5 个交易日整合信息")
+        st.subheader("Latest 5 Trading Days")
         st.caption(
-            f"当前策略已更新到 {latest_report_date}。默认重点展示最近 5 个已生成交易日，"
-            "更早的历史交易策略已折叠，展开后可按 5 日窗口查看。"
+            f"Strategy coverage is updated through {latest_report_date}. "
+            "The dashboard highlights the latest 5 generated trading days by default, "
+            "while older strategy history stays collapsed into 5-day windows."
         )
         for _, persona in personas.iterrows():
             render_strategy_matrix(persona, recent_dates, reports, orders, trades)
         if older_date_windows:
-            with st.expander("历史交易策略", expanded=False):
+            with st.expander("Historical Strategy Windows", expanded=False):
                 for history_dates in older_date_windows:
                     start_date = history_dates[0]
                     end_date = history_dates[-1]
-                    with st.expander(f"{start_date} 至 {end_date}", expanded=False):
+                    with st.expander(f"{start_date} to {end_date}", expanded=False):
                         for _, persona in personas.iterrows():
                             render_strategy_matrix(persona, history_dates, reports, orders, trades)
