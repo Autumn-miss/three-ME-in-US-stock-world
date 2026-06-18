@@ -2,14 +2,49 @@
 
 A local-first virtual US stock investing simulator. Three simulated investors each start with USD 20,000, trade virtually inside a large-cap US stock universe, and keep a close watch on AI-related names.
 
-This project is designed as a living virtual market world that updates every day, not just a static backtest:
+This project is designed as a living virtual market world that updates every day, not just a static backtest.
 
-- 3 distinct investing personas: Quality & Stability, Growth & Momentum, and Contrarian Value
-- Uses real Yahoo Finance daily market data to update the most recent closed US trading day
-- Automatically generates market summaries, AI sector notes, virtual orders, trade reviews, and next-day plans
-- Provides a Streamlit dashboard for holdings, return curves, executed trades, and the most recent 5 trading days of strategy output
+## What This Project Does
 
-It is useful for observing how different investing styles react to the same US stock universe and AI-related opportunities over time. It is not investment advice and it is not an automated live trading system.
+- Simulates 3 distinct investing personas: Quality & Stability, Growth & Momentum, and Contrarian Value
+- Updates the most recent closed US trading day with real Yahoo Finance daily market data
+- Executes virtual limit orders based on each persona's own decision rules
+- Generates daily market summaries, AI sector notes, trade reviews, and next-day plans
+- Visualizes holdings, return curves, trades, and recent strategy output in a Streamlit dashboard
+
+This repository is for simulation, observation, and research. It is not investment advice and it is not an automated live trading system.
+
+## Features
+
+- Multi-persona simulation: compare how different investing styles react to the same market environment
+- AI-sector focus: track AI-related US stocks alongside broader large-cap names
+- Daily workflow: prices, order execution, reporting, and strategy generation in one repeatable process
+- Real-data-first design: the default run fails explicitly if real quotes cannot be fetched
+- Recent strategy emphasis: the dashboard highlights the latest 5 trading days and collapses older history
+- Local-first setup: runs on your own machine with a SQLite database and Streamlit UI
+
+## How It Works
+
+1. `run_daily.py` finds the latest closed US trading day that still needs to be processed.
+2. The system fetches daily OHLC data from Yahoo Finance.
+3. Pending virtual orders are evaluated and executed against the daily price range.
+4. Each persona generates a new interpretation of the market and a new action plan.
+5. Portfolio snapshots, reports, and strategy records are written into the local SQLite database.
+6. `app.py` reads the database and presents the latest state in the Streamlit dashboard.
+
+## Screenshots
+
+### GitHub Repository Overview
+
+![GitHub repository overview](assets/screenshots/github-repo-home.png)
+
+The repository homepage shows the English project summary, setup instructions, and supporting metadata for open-source visitors.
+
+### Strategy Dashboard
+
+![Strategy dashboard](assets/screenshots/strategy-dashboard.png)
+
+This dashboard view highlights the recent 5-trading-day strategy matrix. The current dashboard interface is Chinese-first, while the public-facing GitHub documentation is maintained in English.
 
 ## Quick Start
 
@@ -24,7 +59,7 @@ If Streamlit is not installed yet:
 python3 -m pip install -r requirements.txt
 ```
 
-By default, the project uses only real daily market data. If real quotes cannot be fetched, the run fails explicitly instead of silently falling back to demo prices. The core trading engine and tests rely only on the Python standard library, while real market data is fetched from the Yahoo Finance chart endpoint.
+Open the dashboard locally at [http://localhost:8501](http://localhost:8501).
 
 ## Common Commands
 
@@ -42,6 +77,8 @@ Use synthetic demo prices only when you intentionally want an offline product de
 python3 run_daily.py --reset --demo-days 30 --allow-synthetic
 ```
 
+By default, the project uses only real daily market data. If real quotes cannot be fetched, the run fails explicitly instead of silently falling back to demo prices.
+
 ## Project Structure
 
 - `app.py`: Streamlit dashboard
@@ -49,11 +86,27 @@ python3 run_daily.py --reset --demo-days 30 --allow-synthetic
 - `backfill.py`: backfills multiple days of real market data
 - `virtual_trader/`: database, market data, strategies, execution engine, and daily report logic
 - `tests/`: trading-rule test suite
+- `assets/screenshots/`: README images for GitHub presentation
 
 ## Data Model and Limits
 
 - Default database: `data/virtual_trader.sqlite3`
 - Default starting capital per simulated investor: `USD 20,000`
 - Long-only stock trading, with no shorting, leverage, margin, or options
-- Daily execution is approximated from OHLC ranges rather than intraday tick or minute data
-- The project is for simulation, observation, and research only, not for real investment decisions
+- Daily execution is approximated from OHLC ranges rather than tick or minute-level data
+- The core trading engine and tests rely only on the Python standard library
+- Real market data is fetched from the Yahoo Finance chart endpoint
+
+## Roadmap
+
+- Translate the Streamlit dashboard UI into English
+- Add richer performance analytics by persona and sector
+- Expand screenshot coverage for holdings, orders, and return curves
+- Improve daily report formatting and export options
+- Add deployment and sharing options beyond local-only usage
+
+## Notes for Contributors
+
+- The repository is public and open to suggestions, issues, and pull requests
+- The local database, logs, and secrets are intentionally excluded from Git tracking
+- When real Yahoo Finance data is unavailable, the default behavior is to fail rather than hide the problem
