@@ -1,32 +1,32 @@
-# 虚拟美股投资世界
+# Virtual US Stock World
 
-一个本机运行的虚拟美股投资观察系统。三个虚拟投资人各持有 20,000 美元，在大型美股池中进行纯虚拟交易，并特别观察 AI 产业链股票。
+A local-first virtual US stock investing simulator. Three simulated investors each start with USD 20,000, trade virtually inside a large-cap US stock universe, and keep a close watch on AI-related names.
 
-这个项目更接近一个“会每天更新的虚拟投资世界”，而不只是静态回测：
+This project is designed as a living virtual market world that updates every day, not just a static backtest:
 
-- 3 个不同风格的虚拟投资人格：稳健质量型、成长动量型、逆向价值型
-- 使用真实 Yahoo Finance 日线数据更新最近一个已收盘的美股交易日
-- 自动生成每日市场摘要、AI 产业链观察、虚拟订单、成交复盘和交易计划
-- 通过 Streamlit dashboard 查看持仓、收益曲线、订单交易和最近 5 个交易日策略
+- 3 distinct investing personas: Quality & Stability, Growth & Momentum, and Contrarian Value
+- Uses real Yahoo Finance daily market data to update the most recent closed US trading day
+- Automatically generates market summaries, AI sector notes, virtual orders, trade reviews, and next-day plans
+- Provides a Streamlit dashboard for holdings, return curves, executed trades, and the most recent 5 trading days of strategy output
 
-适合用来观察不同投资风格在同一批美股与 AI 相关标的上的日常决策差异，而不是作为真实投资建议或自动交易系统。
+It is useful for observing how different investing styles react to the same US stock universe and AI-related opportunities over time. It is not investment advice and it is not an automated live trading system.
 
-## 快速开始
+## Quick Start
 
 ```bash
 python3 run_daily.py --reset --demo-days 8
 python3 -m streamlit run app.py
 ```
 
-如果尚未安装 Streamlit：
+If Streamlit is not installed yet:
 
 ```bash
 python3 -m pip install -r requirements.txt
 ```
 
-默认只使用真实日线行情。若真实行情拉取失败，系统会报错，而不会悄悄用演示价格。核心交易引擎和测试只依赖 Python 标准库，真实行情默认来自 Yahoo Finance chart 接口。
+By default, the project uses only real daily market data. If real quotes cannot be fetched, the run fails explicitly instead of silently falling back to demo prices. The core trading engine and tests rely only on the Python standard library, while real market data is fetched from the Yahoo Finance chart endpoint.
 
-## 常用命令
+## Common Commands
 
 ```bash
 python3 run_daily.py
@@ -36,24 +36,24 @@ python3 backfill.py --days 30
 python3 -m unittest discover -s tests
 ```
 
-只有在明确想离线体验功能时，才使用演示合成行情：
+Use synthetic demo prices only when you intentionally want an offline product demo:
 
 ```bash
 python3 run_daily.py --reset --demo-days 30 --allow-synthetic
 ```
 
-## 目录
+## Project Structure
 
 - `app.py`: Streamlit dashboard
-- `run_daily.py`: 每日流程入口
-- `backfill.py`: 补齐多日真实行情数据
-- `virtual_trader/`: 数据库、行情、策略、成交引擎和日报逻辑
-- `tests/`: 交易规则测试
+- `run_daily.py`: daily workflow entry point
+- `backfill.py`: backfills multiple days of real market data
+- `virtual_trader/`: database, market data, strategies, execution engine, and daily report logic
+- `tests/`: trading-rule test suite
 
-## 数据与边界
+## Data Model and Limits
 
-- 默认数据库：`data/virtual_trader.sqlite3`
-- 默认每个虚拟投资人初始资金：`20,000 USD`
-- 只做多股票，不做空、不融资、不使用期权或杠杆
-- 日内成交使用 OHLC 区间代理，不接分钟级行情
-- 项目仅用于虚拟模拟、观察和研究，不构成真实投资建议
+- Default database: `data/virtual_trader.sqlite3`
+- Default starting capital per simulated investor: `USD 20,000`
+- Long-only stock trading, with no shorting, leverage, margin, or options
+- Daily execution is approximated from OHLC ranges rather than intraday tick or minute data
+- The project is for simulation, observation, and research only, not for real investment decisions
