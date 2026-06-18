@@ -52,6 +52,12 @@ This dashboard view highlights the recent 5-trading-day strategy matrix.
 
 The dashboard UI is being translated progressively into English, starting with the page title, top navigation, and key section headers.
 
+### Holdings Dashboard
+
+![Holdings dashboard](assets/screenshots/holdings-dashboard.png)
+
+The holdings view now uses English persona labels, English style names, and fully English field labels for position summaries and trade history.
+
 ## Quick Start
 
 ```bash

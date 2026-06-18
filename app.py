@@ -204,7 +204,19 @@ def table_height(row_count: int, max_rows: int | None = None) -> int:
     return min(38 + max(1, visible_rows) * 35, 900)
 
 
-POSITION_COLUMNS = ["虚拟人", "股票", "公司（行业）", "AI 标签", "累计持股数量", "成本", "现价", "市值", "浮盈亏"]
+PERSONA_NAME_MAP = {
+    "稳健质量型": "Quality & Stability",
+    "成长动量型": "Growth & Momentum",
+    "逆向价值型": "Contrarian Value",
+}
+
+PERSONA_STYLE_MAP = {
+    "质量与风控": "Quality and Risk Control",
+    "成长与趋势": "Growth and Trend",
+    "逆向与估值修复": "Contrarian and Valuation Reversion",
+}
+
+POSITION_COLUMNS = ["Persona", "Ticker", "Company (Sector)", "AI Tags", "Total Shares", "Cost Basis", "Last Price", "Market Value", "Unrealized P&L"]
 
 
 def build_position_view(positions_df: pd.DataFrame, personas_df: pd.DataFrame, symbols_df: pd.DataFrame) -> pd.DataFrame:
@@ -224,28 +236,28 @@ def build_position_view(positions_df: pd.DataFrame, personas_df: pd.DataFrame, s
 
     view = source.merge(personas_df, left_on="persona_id", right_on="id", how="left").rename(
         columns={
-            "name": "虚拟人",
-            "symbol": "股票",
-            "company_name": "公司全名",
-            "sector": "行业",
-            "quantity": "股数",
-            "avg_cost": "平均成本",
-            "last_price": "最新价",
-            "market_value": "市值",
-            "unrealized_pnl": "浮盈亏",
-            "ai_tags": "AI 标签",
+            "name": "Persona",
+            "symbol": "Ticker",
+            "company_name": "Company Name",
+            "sector": "Sector",
+            "quantity": "Shares",
+            "avg_cost": "Average Cost",
+            "last_price": "Last Price",
+            "market_value": "Market Value",
+            "unrealized_pnl": "Unrealized P&L",
+            "ai_tags": "AI Tags",
         }
     )
     for column in POSITION_COLUMNS:
         if column not in view.columns:
             view[column] = ""
-    view["公司（行业）"] = view.apply(
-        lambda row: f"{row['公司全名']}（{row['行业']}）" if row["行业"] else row["公司全名"],
+    view["Company (Sector)"] = view.apply(
+        lambda row: f"{row['Company Name']} ({row['Sector']})" if row["Sector"] else row["Company Name"],
         axis=1,
     )
-    view["累计持股数量"] = view["股数"]
-    view["成本"] = view["平均成本"]
-    view["现价"] = view["最新价"]
+    view["Total Shares"] = view["Shares"]
+    view["Cost Basis"] = view["Average Cost"]
+    view["Last Price"] = view["Last Price"]
     return view[POSITION_COLUMNS]
 
 
@@ -266,39 +278,39 @@ def quantity(value: object) -> str:
 def render_position_cards(position_view: pd.DataFrame) -> None:
     for _, row in position_view.iterrows():
         data = row.to_dict()
-        pnl_value = float(data.get("浮盈亏") or 0)
+        pnl_value = float(data.get("Unrealized P&L") or 0)
         pnl_class = "position-pnl-positive" if pnl_value >= 0 else "position-pnl-negative"
-        ai_tags = data.get("AI 标签") or "非 AI 标签股"
+        ai_tags = data.get("AI Tags") or "No AI tags"
         st.markdown(
             f"""
             <div class="position-card">
               <div class="position-head">
                 <div>
-                  <div class="position-title">{escape(str(data["股票"]))} · {escape(str(data["公司（行业）"]))}</div>
+                  <div class="position-title">{escape(str(data["Ticker"]))} · {escape(str(data["Company (Sector)"]))}</div>
                   <div class="position-subtitle">{escape(str(ai_tags))}</div>
                 </div>
-                <div class="position-persona">{escape(str(data["虚拟人"]))}</div>
+                <div class="position-persona">{escape(str(data["Persona"]))}</div>
               </div>
               <div class="position-grid">
                 <div>
-                  <div class="position-label">累计持股数量</div>
-                  <div class="position-value">{quantity(data["累计持股数量"])}</div>
+                  <div class="position-label">Total Shares</div>
+                  <div class="position-value">{quantity(data["Total Shares"])}</div>
                 </div>
                 <div>
-                  <div class="position-label">成本</div>
-                  <div class="position-value">{money(data["成本"])}</div>
+                  <div class="position-label">Cost Basis</div>
+                  <div class="position-value">{money(data["Cost Basis"])}</div>
                 </div>
                 <div>
-                  <div class="position-label">现价</div>
-                  <div class="position-value">{money(data["现价"])}</div>
+                  <div class="position-label">Last Price</div>
+                  <div class="position-value">{money(data["Last Price"])}</div>
                 </div>
                 <div>
-                  <div class="position-label">市值</div>
-                  <div class="position-value">{money(data["市值"])}</div>
+                  <div class="position-label">Market Value</div>
+                  <div class="position-value">{money(data["Market Value"])}</div>
                 </div>
                 <div>
-                  <div class="position-label">浮盈亏</div>
-                  <div class="position-value {pnl_class}">{money(data["浮盈亏"])}</div>
+                  <div class="position-label">Unrealized P&amp;L</div>
+                  <div class="position-value {pnl_class}">{money(data["Unrealized P&L"])}</div>
                 </div>
               </div>
             </div>
@@ -316,16 +328,16 @@ def build_position_ledger(
     summary_columns = [
         "persona_id",
         "symbol",
-        "虚拟人",
-        "公司（行业）",
-        "总持股数量",
-        "成本",
-        "现价",
-        "持仓市值",
-        "已实现盈利",
-        "未实现盈利",
-        "总盈利",
-        "交易次数",
+        "Persona",
+        "Company (Sector)",
+        "Total Shares",
+        "Cost Basis",
+        "Last Price",
+        "Position Value",
+        "Realized P&L",
+        "Unrealized P&L",
+        "Total P&L",
+        "Trade Count",
     ]
     if trades_df.empty:
         return pd.DataFrame(columns=summary_columns), {}
@@ -359,19 +371,19 @@ def build_position_ledger(
 
             history_rows.append(
                 {
-                    "交易日": trade["trade_date"],
-                    "方向": "买入" if trade["side"] == "BUY" else "卖出",
-                    "数量": quantity_value,
-                    "价格": price_value,
-                    "金额": amount_value,
-                    "交易后持股": held_quantity,
-                    "交易后成本": avg_cost if held_quantity else 0.0,
-                    "理由": trade["reason"],
+                    "Trade Date": trade["trade_date"],
+                    "Side": "Buy" if trade["side"] == "BUY" else "Sell",
+                    "Shares": quantity_value,
+                    "Price": price_value,
+                    "Amount": amount_value,
+                    "Shares After Trade": held_quantity,
+                    "Cost Basis After Trade": avg_cost if held_quantity else 0.0,
+                    "Reason": trade["reason"],
                 }
             )
 
         meta = symbol_meta.get(symbol, {"name": symbol, "sector": "", "ai_tags": ""})
-        company = f"{meta['name']}（{meta['sector']}）" if meta.get("sector") else meta["name"]
+        company = f"{meta['name']} ({meta['sector']})" if meta.get("sector") else meta["name"]
         last_price = float(latest_prices.get(symbol, avg_cost or 0.0))
         market_value = held_quantity * last_price
         unrealized_pnl = held_quantity * (last_price - avg_cost)
@@ -382,16 +394,16 @@ def build_position_ledger(
             {
                 "persona_id": persona_id,
                 "symbol": symbol,
-                "虚拟人": persona_names.get(persona_id, persona_id),
-                "公司（行业）": company,
-                "总持股数量": held_quantity,
-                "成本": avg_cost,
-                "现价": last_price,
-                "持仓市值": market_value,
-                "已实现盈利": realized_pnl,
-                "未实现盈利": unrealized_pnl,
-                "总盈利": total_pnl,
-                "交易次数": len(history_rows),
+                "Persona": persona_names.get(persona_id, persona_id),
+                "Company (Sector)": company,
+                "Total Shares": held_quantity,
+                "Cost Basis": avg_cost,
+                "Last Price": last_price,
+                "Position Value": market_value,
+                "Realized P&L": realized_pnl,
+                "Unrealized P&L": unrealized_pnl,
+                "Total P&L": total_pnl,
+                "Trade Count": len(history_rows),
             }
         )
         histories[key] = pd.DataFrame(history_rows)
@@ -401,36 +413,36 @@ def build_position_ledger(
 
 def render_position_ledger(summary_df: pd.DataFrame, histories: dict[tuple[str, str], pd.DataFrame]) -> None:
     if summary_df.empty:
-        st.info("暂无成交记录。")
+        st.info("No executed trades yet.")
         return
 
-    for _, row in summary_df.sort_values(["虚拟人", "symbol"]).iterrows():
-        pnl_class = "position-pnl-positive" if float(row["总盈利"]) >= 0 else "position-pnl-negative"
-        title = f"{row['虚拟人']} · {row['symbol']} · {row['公司（行业）']}"
+    for _, row in summary_df.sort_values(["Persona", "symbol"]).iterrows():
+        pnl_class = "position-pnl-positive" if float(row["Total P&L"]) >= 0 else "position-pnl-negative"
+        title = f"{row['Persona']} · {row['symbol']} · {row['Company (Sector)']}"
         with st.expander(title, expanded=True):
             st.markdown(
                 f"""
                 <div class="position-card">
                   <div class="position-grid">
                     <div>
-                      <div class="position-label">总持股数量</div>
-                      <div class="position-value">{quantity(row["总持股数量"])}</div>
+                      <div class="position-label">Total Shares</div>
+                      <div class="position-value">{quantity(row["Total Shares"])}</div>
                     </div>
                     <div>
-                      <div class="position-label">成本</div>
-                      <div class="position-value">{money(row["成本"])}</div>
+                      <div class="position-label">Cost Basis</div>
+                      <div class="position-value">{money(row["Cost Basis"])}</div>
                     </div>
                     <div>
-                      <div class="position-label">现价</div>
-                      <div class="position-value">{money(row["现价"])}</div>
+                      <div class="position-label">Last Price</div>
+                      <div class="position-value">{money(row["Last Price"])}</div>
                     </div>
                     <div>
-                      <div class="position-label">持仓市值</div>
-                      <div class="position-value">{money(row["持仓市值"])}</div>
+                      <div class="position-label">Position Value</div>
+                      <div class="position-value">{money(row["Position Value"])}</div>
                     </div>
                     <div>
-                      <div class="position-label">总盈利</div>
-                      <div class="position-value {pnl_class}">{money(row["总盈利"])}</div>
+                      <div class="position-label">Total P&amp;L</div>
+                      <div class="position-value {pnl_class}">{money(row["Total P&L"])}</div>
                     </div>
                   </div>
                 </div>
@@ -442,11 +454,11 @@ def render_position_ledger(summary_df: pd.DataFrame, histories: dict[tuple[str, 
                 width="stretch",
                 hide_index=True,
                 column_config={
-                    "数量": st.column_config.NumberColumn(format="%.4f"),
-                    "价格": st.column_config.NumberColumn(format="$%.2f"),
-                    "金额": st.column_config.NumberColumn(format="$%.2f"),
-                    "交易后持股": st.column_config.NumberColumn(format="%.4f"),
-                    "交易后成本": st.column_config.NumberColumn(format="$%.2f"),
+                    "Shares": st.column_config.NumberColumn(format="%.4f"),
+                    "Price": st.column_config.NumberColumn(format="$%.2f"),
+                    "Amount": st.column_config.NumberColumn(format="$%.2f"),
+                    "Shares After Trade": st.column_config.NumberColumn(format="%.4f"),
+                    "Cost Basis After Trade": st.column_config.NumberColumn(format="$%.2f"),
                 },
             )
 
@@ -616,6 +628,9 @@ def load_data(db_path: str):
 
 data = load_data(str(DB_PATH))
 personas = pd.DataFrame(data["personas"])
+if not personas.empty:
+    personas["name"] = personas["name"].map(lambda value: PERSONA_NAME_MAP.get(str(value), str(value)))
+    personas["style"] = personas["style"].map(lambda value: PERSONA_STYLE_MAP.get(str(value), str(value)))
 symbols = pd.DataFrame(data["symbols"])
 positions = pd.DataFrame(data["positions"])
 snapshots = pd.DataFrame(data["snapshots"])
