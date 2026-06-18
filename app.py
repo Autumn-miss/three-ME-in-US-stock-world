@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from html import escape
 from pathlib import Path
+import re
 
 import pandas as pd
 import plotly.express as px
@@ -230,6 +231,106 @@ STRATEGY_ROW_MAP = {
     "行动": "Orders and Executions",
     "复盘": "Review",
 }
+
+TRANSLATION_REPLACEMENTS = [
+    ("今日市场数据有限，虚拟人主要依据个股价格和风控规则行动。", "Market data is limited today, so the personas rely mainly on single-stock price action and risk rules."),
+    ("今日没有到期订单需要复盘。", "No expiring orders require review today."),
+    ("今日不新增订单，继续观察现有持仓和 AI 产业链变化。", "No new orders today. Continue watching current holdings and AI-sector developments."),
+    ("当前没有持仓，第一优先级是建立第一笔观察仓。", "There are no current positions. The first priority is to open an initial starter position."),
+    ("次日开盘或日内区间触及该限价才成交；没有触及就过期。", "The order fills only if the next day's open or intraday range touches the limit price; otherwise it expires."),
+    ("仍受现金、单股仓位、持仓数量和禁止做空规则约束；当前状态", "The order still remains subject to cash, single-position size, position-count, and no-shorting limits; current status"),
+    ("没有同时满足该人格买入/卖出条件和风控约束的机会。", "No setup met both the persona's buy/sell conditions and its risk constraints."),
+    ("继续按规则等待：", "Keep waiting under the rules: "),
+    ("主要指数表现：", "Major index moves: "),
+    ("AI 产业链强势标的：", "AI leaders: "),
+    ("回调标的：", "Pullback names: "),
+    ("AI 强势：", "AI leaders: "),
+    ("AI 回调：", "AI pullbacks: "),
+    ("当前持仓：", "Current positions: "),
+    ("现金", "Cash"),
+    ("估算总资产", "Estimated total value"),
+    ("成本", "cost"),
+    ("现价", "last price"),
+    ("限价", "limit"),
+    ("有效日", "valid on"),
+    ("状态", "status"),
+    ("已成交", "filled"),
+    ("未成交：", "not filled: "),
+    ("触发逻辑：", "Execution rule: "),
+    ("选择理由：", "Why selected: "),
+    ("风控含义：", "Risk control: "),
+    ("今日行动", "Today's action"),
+    ("原因", "Reason"),
+    ("下一步观察", "Next watch item"),
+    ("买入计划", "Buy plan"),
+    ("卖出计划", "Sell plan"),
+    ("买入", "Buy"),
+    ("卖出", "Sell"),
+    ("股", "shares"),
+    ("质量型组合补充", "Quality portfolio adds"),
+    ("成长动量型追踪强势趋势", "Growth & Momentum tracks a strong trend in"),
+    ("成长动量型给", "Growth & Momentum gives"),
+    ("逆向价值型等待", "Contrarian Value waits for"),
+    ("逆向价值型计划在", "Contrarian Value plans to"),
+    ("当前持仓收益", "current holding return"),
+    ("做纪律性减仓", "to trim the position under discipline"),
+    ("设置风控卖出计划", "to set a risk-control sell plan"),
+    ("回落到更舒服的价格再接。", "to pull back to a more comfortable entry price before buying."),
+    ("反弹后兑现部分修复收益。", "to realize part of the rebound recovery gain."),
+    ("次日回落和 AI 相关度较突出。", "for a next-day pullback with strong AI relevance."),
+    ("持仓数量超过上限。", "Position count exceeds the limit."),
+    ("次日日内价格没有触及计划价，订单当日失效。", "The next day's intraday price never touched the planned price, so the order expired."),
+    ("触发时现金不足，规则层拒绝成交。", "Cash was insufficient at trigger time, so the execution was rejected by the rules."),
+    ("触发时持仓不足，禁止做空。", "Holdings were insufficient at trigger time; short selling is not allowed."),
+    ("现金不足，规则层拒绝买入。", "Cash is insufficient, so the buy was rejected by the rules."),
+    ("单股计划仓位超过上限。", "The planned single-stock position exceeds the limit."),
+    ("买入后现金低于最低保留比例。", "Cash would fall below the minimum reserve ratio after the buy."),
+    ("卖出数量超过当前持仓，禁止做空。", "Sell quantity exceeds the current position; short selling is not allowed."),
+]
+
+
+def translate_chinese_text(text: object) -> str:
+    source = str(text or "").strip()
+    if not source:
+        return "-"
+
+    translated = source
+    for original, replacement in TRANSLATION_REPLACEMENTS:
+        translated = translated.replace(original, replacement)
+
+    translated = re.sub(r"\bBUY\b", "Buy", translated)
+    translated = re.sub(r"\bSELL\b", "Sell", translated)
+    translated = re.sub(r"\bPENDING\b", "Pending", translated)
+    translated = re.sub(r"\bFILLED\b", "Filled", translated)
+    translated = re.sub(r"\bREJECTED\b", "Rejected", translated)
+    translated = re.sub(r"\bEXPIRED\b", "Expired", translated)
+    translated = translated.replace("，", ", ").replace("。", ". ").replace("；", "; ").replace("：", ": ")
+    translated = translated.replace("（", "(").replace("）", ")")
+    translated = re.sub(r"\s+", " ", translated).strip()
+    return translated
+
+
+def bilingual_plain_text(value: object) -> str:
+    if pd.isna(value):
+        return "-"
+    original = str(value or "").strip()
+    if not original:
+        return "-"
+    return f"EN: {translate_chinese_text(original)}\nZH: {original}"
+
+
+def bilingual_html_text(value: object) -> str:
+    if pd.isna(value):
+        return "-"
+    original = str(value or "").strip()
+    if not original:
+        return "-"
+    english = translate_chinese_text(original)
+    return (
+        f"<strong>EN:</strong> {escape(english).replace(chr(10), '<br>')}"
+        "<br>"
+        f"<strong>ZH:</strong> {escape(original).replace(chr(10), '<br>')}"
+    )
 
 POSITION_COLUMNS = ["Persona", "Ticker", "Company (Sector)", "AI Tags", "Total Shares", "Cost Basis", "Last Price", "Market Value", "Unrealized P&L"]
 
@@ -483,19 +584,17 @@ def action_text_for_date(persona_id: str, day: str, orders_df: pd.DataFrame, tra
     if not trades_df.empty:
         day_trades = trades_df[(trades_df["persona_id"] == persona_id) & (trades_df["trade_date"] == day)]
         for _, trade in day_trades.iterrows():
-            side = "Buy" if trade["side"] == "BUY" else "Sell"
-            lines.append(
-                f"- Executed: {side} {trade['symbol']} {float(trade['quantity']):.4f} shares at {float(trade['price']):.2f}."
-            )
+            side = "买入" if trade["side"] == "BUY" else "卖出"
+            lines.append(f"- 已成交：{side} {trade['symbol']} {float(trade['quantity']):.4f} 股，价格 {float(trade['price']):.2f}。")
     if not orders_df.empty:
         day_orders = orders_df[(orders_df["persona_id"] == persona_id) & (orders_df["plan_date"] == day)]
         for _, order in day_orders.iterrows():
-            side = "Buy" if order["side"] == "BUY" else "Sell"
+            side = "买入" if order["side"] == "BUY" else "卖出"
             status = order["status"]
             lines.append(
-                f"- Planned order: {side} {order['symbol']} {float(order['quantity']):.4f} shares, limit {float(order['limit_price']):.2f}, status {status}."
+                f"- 计划订单：{side} {order['symbol']} {float(order['quantity']):.4f} 股，限价 {float(order['limit_price']):.2f}，状态 {status}。"
             )
-    return "\n".join(lines) if lines else "- No executions or new orders for this day."
+    return "\n".join(lines) if lines else "- 当日没有成交或新增订单。"
 
 
 STRATEGY_ROWS = [
@@ -577,14 +676,14 @@ def strategy_cell(
         return "-"
     sections = parse_strategy_sections(str(report_row["analysis"]))
     if label == "我看到的市场":
-        return html_text(report_row["market_summary"])
+        return bilingual_html_text(report_row["market_summary"])
     if label == "今日行动":
-        return html_text(report_row["plan_text"])
+        return bilingual_html_text(report_row["plan_text"])
     if label == "行动":
-        return html_text(action_text_for_date(persona_id, report_date, orders_df, trades_df))
+        return bilingual_html_text(action_text_for_date(persona_id, report_date, orders_df, trades_df))
     if label == "复盘":
-        return html_text(report_row["review"])
-    return html_text(sections.get(label, ""))
+        return bilingual_html_text(report_row["review"])
+    return bilingual_html_text(sections.get(label, ""))
 
 
 def render_strategy_matrix(
@@ -739,6 +838,8 @@ with tabs[3]:
         st.info("No orders yet.")
     else:
         order_view = orders.merge(personas, left_on="persona_id", right_on="id")
+        order_view["reason"] = order_view["reason"].map(bilingual_plain_text)
+        order_view["miss_reason"] = order_view["miss_reason"].map(bilingual_plain_text)
         st.dataframe(
             order_view.rename(
                 columns={
@@ -765,6 +866,7 @@ with tabs[3]:
         st.info("No trades yet.")
     else:
         trade_view = trades.merge(personas, left_on="persona_id", right_on="id")
+        trade_view["reason"] = trade_view["reason"].map(bilingual_plain_text)
         st.dataframe(
             trade_view.rename(
                 columns={
@@ -785,18 +887,18 @@ with tabs[3]:
 with tabs[4]:
     st.subheader("AI Watchlist")
     ai_symbol_view = ai_symbols.rename(
-        columns={"symbol": "股票", "name": "公司", "sector": "板块", "ai_tags": "AI 标签"}
-    )[["股票", "公司", "板块", "AI 标签"]]
+        columns={"symbol": "Ticker", "name": "Company", "sector": "Sector", "ai_tags": "AI Tags"}
+    )[["Ticker", "Company", "Sector", "AI Tags"]]
     st.dataframe(
         ai_symbol_view,
         width="stretch",
         height=table_height(len(ai_symbol_view)),
         hide_index=True,
         column_config={
-            "股票": st.column_config.TextColumn(width="small"),
-            "公司": st.column_config.TextColumn(width="medium"),
-            "板块": st.column_config.TextColumn(width="medium"),
-            "AI 标签": st.column_config.TextColumn(width="large"),
+            "Ticker": st.column_config.TextColumn(width="small"),
+            "Company": st.column_config.TextColumn(width="medium"),
+            "Sector": st.column_config.TextColumn(width="medium"),
+            "AI Tags": st.column_config.TextColumn(width="large"),
         },
     )
     if not positions.empty:

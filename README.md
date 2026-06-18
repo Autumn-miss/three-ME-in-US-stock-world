@@ -44,7 +44,7 @@ The repository homepage shows the English project summary, setup instructions, a
 
 ![Strategy dashboard](assets/screenshots/strategy-dashboard.png)
 
-This strategy view shows the English page title, top navigation, persona ranking cards, and the strategy section entry point.
+This strategy view shows the English page title, top navigation, persona ranking cards, and a bilingual strategy section entry point.
 
 ### Returns Dashboard
 
@@ -62,7 +62,7 @@ The holdings view now uses English persona labels, English style names, and full
 
 ![Orders and trades dashboard](assets/screenshots/orders-dashboard.png)
 
-The orders and trades view now uses English table headers for planned orders, execution records, and status tracking.
+The orders and trades view now uses English table headers plus bilingual `EN / ZH` reasoning fields for planned orders and executions.
 
 ## Quick Start
 
