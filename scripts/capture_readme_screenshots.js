@@ -17,8 +17,9 @@ async function capture() {
     {
       url: "http://127.0.0.1:8501/",
       path: "assets/screenshots/strategy-dashboard.png",
-      viewport: { width: 1440, height: 1400 },
+      viewport: { width: 1440, height: 900 },
       fullPage: false,
+      clip: { x: 0, y: 0, width: 1440, height: 620 },
       waitFor: { selector: '[data-testid="stAppViewContainer"]' },
       afterLoad: async (page) => {
         await page.getByText("Strategy", { exact: true }).click();
@@ -69,7 +70,11 @@ async function capture() {
     if (pageDef.afterLoad) {
       await pageDef.afterLoad(page);
     }
-    await page.screenshot({ path: pageDef.path, fullPage: pageDef.fullPage });
+    const screenshotOptions = { path: pageDef.path, fullPage: pageDef.fullPage };
+    if (pageDef.clip) {
+      screenshotOptions.clip = pageDef.clip;
+    }
+    await page.screenshot(screenshotOptions);
     await page.close();
   }
 

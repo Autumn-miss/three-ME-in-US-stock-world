@@ -44,7 +44,7 @@ The repository homepage shows the English project summary, setup instructions, a
 
 ![Strategy dashboard](assets/screenshots/strategy-dashboard.png)
 
-This dashboard view highlights the recent 5-trading-day strategy matrix.
+This strategy view shows the English page title, top navigation, persona ranking cards, and the strategy section entry point.
 
 ### Returns Dashboard
 
