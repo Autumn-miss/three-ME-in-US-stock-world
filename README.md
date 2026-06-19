@@ -1,8 +1,12 @@
 # Virtual US Stock World
 
+![Virtual US Stock World cover](assets/social/repo-cover.svg)
+
 A local-first virtual US stock investing simulator. Three simulated investors each start with USD 20,000, trade virtually inside a large-cap US stock universe, and keep a close watch on AI-related names.
 
 This project is designed as a living virtual market world that updates every day, not just a static backtest.
+
+Latest project history is tracked in [CHANGELOG.md](CHANGELOG.md).
 
 ## What This Project Does
 
