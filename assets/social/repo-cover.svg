@@ -30,51 +30,51 @@
   <circle cx="172" cy="556" r="118" fill="#E0F0F2" opacity="0.95"/>
   <path d="M0 525C200 445 280 448 450 515C615 580 718 575 895 489C1043 417 1130 405 1280 444V640H0V525Z" fill="#EFF5F7"/>
 
-  <rect x="736" y="86" width="430" height="392" rx="28" fill="url(#panel)"/>
-  <rect x="770" y="124" width="128" height="88" rx="18" fill="#FFFFFF" opacity="0.1"/>
-  <rect x="918" y="124" width="102" height="88" rx="18" fill="#FFFFFF" opacity="0.08"/>
-  <rect x="1040" y="124" width="92" height="88" rx="18" fill="#FFFFFF" opacity="0.08"/>
-  <rect x="770" y="238" width="362" height="186" rx="22" fill="#FFFFFF" opacity="0.08"/>
+  <rect x="846" y="104" width="340" height="344" rx="28" fill="url(#panel)"/>
+  <rect x="874" y="136" width="102" height="72" rx="16" fill="#FFFFFF" opacity="0.1"/>
+  <rect x="994" y="136" width="82" height="72" rx="16" fill="#FFFFFF" opacity="0.08"/>
+  <rect x="1092" y="136" width="62" height="72" rx="16" fill="#FFFFFF" opacity="0.08"/>
+  <rect x="874" y="230" width="280" height="150" rx="20" fill="#FFFFFF" opacity="0.08"/>
 
-  <text x="110" y="168" fill="#18212B" font-size="62" font-family="Georgia, 'Times New Roman', serif" font-weight="700">
+  <text x="96" y="168" fill="#18212B" font-size="58" font-family="Georgia, 'Times New Roman', serif" font-weight="700">
     Virtual US Stock World
   </text>
-  <text x="110" y="222" fill="#46525E" font-size="25" font-family="'Trebuchet MS', Verdana, sans-serif">
+  <text x="96" y="222" fill="#46525E" font-size="25" font-family="'Trebuchet MS', Verdana, sans-serif">
     A local-first investing simulator with three personas,
   </text>
-  <text x="110" y="258" fill="#46525E" font-size="25" font-family="'Trebuchet MS', Verdana, sans-serif">
+  <text x="96" y="258" fill="#46525E" font-size="25" font-family="'Trebuchet MS', Verdana, sans-serif">
     daily market updates, AI-sector tracking, and Streamlit dashboards.
   </text>
 
   <g>
-    <rect x="110" y="320" width="154" height="42" rx="21" fill="#18212B"/>
-    <text x="136" y="348" fill="#F8F5EE" font-size="20" font-family="'Trebuchet MS', Verdana, sans-serif" font-weight="700">3 PERSONAS</text>
-    <rect x="278" y="320" width="186" height="42" rx="21" fill="#D95D30"/>
-    <text x="305" y="348" fill="#FFF7EF" font-size="20" font-family="'Trebuchet MS', Verdana, sans-serif" font-weight="700">REAL DAILY DATA</text>
-    <rect x="478" y="320" width="170" height="42" rx="21" fill="#2F7D5A"/>
-    <text x="509" y="348" fill="#F2FBF6" font-size="20" font-family="'Trebuchet MS', Verdana, sans-serif" font-weight="700">AI WATCHLIST</text>
+    <rect x="96" y="320" width="154" height="42" rx="21" fill="#18212B"/>
+    <text x="122" y="348" fill="#F8F5EE" font-size="20" font-family="'Trebuchet MS', Verdana, sans-serif" font-weight="700">3 PERSONAS</text>
+    <rect x="264" y="320" width="186" height="42" rx="21" fill="#D95D30"/>
+    <text x="291" y="348" fill="#FFF7EF" font-size="20" font-family="'Trebuchet MS', Verdana, sans-serif" font-weight="700">REAL DAILY DATA</text>
+    <rect x="464" y="320" width="170" height="42" rx="21" fill="#2F7D5A"/>
+    <text x="495" y="348" fill="#F2FBF6" font-size="20" font-family="'Trebuchet MS', Verdana, sans-serif" font-weight="700">AI WATCHLIST</text>
   </g>
 
-  <text x="110" y="436" fill="#18212B" font-size="22" font-family="'Trebuchet MS', Verdana, sans-serif" font-weight="700">
+  <text x="96" y="436" fill="#18212B" font-size="22" font-family="'Trebuchet MS', Verdana, sans-serif" font-weight="700">
     Simulated styles
   </text>
-  <text x="110" y="470" fill="#46525E" font-size="22" font-family="'Trebuchet MS', Verdana, sans-serif">
+  <text x="96" y="470" fill="#46525E" font-size="22" font-family="'Trebuchet MS', Verdana, sans-serif">
     Quality &amp; Stability  •  Growth &amp; Momentum  •  Contrarian Value
   </text>
 
-  <g transform="translate(772 244)">
-    <path d="M0 128H352" stroke="#E8F0F4" stroke-opacity="0.18" stroke-width="1.5"/>
-    <path d="M0 84H352" stroke="#E8F0F4" stroke-opacity="0.12" stroke-width="1.5"/>
-    <path d="M0 40H352" stroke="#E8F0F4" stroke-opacity="0.12" stroke-width="1.5"/>
-    <path d="M16 122C52 122 58 62 94 62C134 62 137 162 182 162C229 162 233 28 280 28C310 28 324 50 336 70" stroke="url(#lineC)" stroke-width="6" stroke-linecap="round"/>
-    <path d="M16 141C54 141 74 104 104 104C144 104 146 145 188 145C221 145 244 70 286 70C307 70 319 88 336 100" stroke="url(#lineB)" stroke-width="6" stroke-linecap="round"/>
-    <path d="M16 94C44 94 60 112 90 112C128 112 150 55 184 55C226 55 235 118 278 118C304 118 322 108 336 94" stroke="url(#lineA)" stroke-width="6" stroke-linecap="round"/>
-    <circle cx="182" cy="162" r="7" fill="#60A5FA"/>
-    <circle cx="286" cy="70" r="7" fill="#34D399"/>
-    <circle cx="278" cy="118" r="7" fill="#FB923C"/>
+  <g transform="translate(884 244)">
+    <path d="M0 106H258" stroke="#E8F0F4" stroke-opacity="0.18" stroke-width="1.5"/>
+    <path d="M0 70H258" stroke="#E8F0F4" stroke-opacity="0.12" stroke-width="1.5"/>
+    <path d="M0 34H258" stroke="#E8F0F4" stroke-opacity="0.12" stroke-width="1.5"/>
+    <path d="M12 100C38 100 44 52 72 52C102 52 106 134 138 134C172 134 176 24 210 24C228 24 240 42 248 58" stroke="url(#lineC)" stroke-width="5" stroke-linecap="round"/>
+    <path d="M12 116C40 116 54 86 76 86C106 86 110 120 140 120C164 120 182 58 214 58C230 58 238 74 248 84" stroke="url(#lineB)" stroke-width="5" stroke-linecap="round"/>
+    <path d="M12 78C34 78 48 92 70 92C100 92 116 46 142 46C174 46 182 98 214 98C232 98 240 90 248 78" stroke="url(#lineA)" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="138" cy="134" r="6" fill="#60A5FA"/>
+    <circle cx="214" cy="58" r="6" fill="#34D399"/>
+    <circle cx="214" cy="98" r="6" fill="#FB923C"/>
   </g>
 
-  <text x="770" y="465" fill="#DDE7EC" font-size="18" font-family="'Trebuchet MS', Verdana, sans-serif">
+  <text x="874" y="430" fill="#DDE7EC" font-size="16" font-family="'Trebuchet MS', Verdana, sans-serif">
     README  •  Changelog  •  Screenshots  •  Local Dashboard
   </text>
 </svg>
