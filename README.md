@@ -2,7 +2,9 @@
 
 ![Virtual US Stock World cover](assets/social/repo-cover.png)
 
-A local-first virtual US stock investing simulator. Three simulated investors each start with USD 20,000, trade virtually inside a large-cap US stock universe, and keep a close watch on AI-related names.
+**Three investing personas. One market. A daily-updated simulation.**
+
+A local-first, explainable US stock simulation where three distinct investing personas react to the same market every trading day, with a close watch on AI-related names.
 
 This project is designed as a living virtual market world that updates every day, not just a static backtest.
 
@@ -11,7 +13,7 @@ Latest project history is tracked in [CHANGELOG.md](CHANGELOG.md).
 ## What This Project Does
 
 - Simulates 3 distinct investing personas: Quality & Stability, Growth & Momentum, and Contrarian Value
-- Updates the most recent closed US trading day with real Yahoo Finance daily market data
+- Updates the most recent closed US trading day with real daily market data
 - Executes virtual limit orders based on each persona's own decision rules
 - Generates daily market summaries, AI sector notes, trade reviews, and next-day plans
 - Visualizes holdings, return curves, trades, and recent strategy output in a Streamlit dashboard
@@ -30,8 +32,8 @@ This repository is for simulation, observation, and research. It is not investme
 
 ## How It Works
 
-1. `run_daily.py` finds the latest closed US trading day that still needs to be processed.
-2. The system fetches daily OHLC data from Yahoo Finance.
+1. `run_daily.py` finds the latest closed US trading day that still needs to be processed, skipping US market holidays.
+2. The system fetches daily OHLC data from Yahoo Finance, with Stooq as a secondary real-data source.
 3. Pending virtual orders are evaluated and executed against the daily price range.
 4. Each persona generates a new interpretation of the market and a new action plan.
 5. Portfolio snapshots, reports, and strategy records are written into the local SQLite database.
@@ -126,7 +128,7 @@ By default, the project uses only real daily market data. If real quotes cannot 
 - Long-only stock trading, with no shorting, leverage, margin, or options
 - Daily execution is approximated from OHLC ranges rather than tick or minute-level data
 - The core trading engine and tests rely only on the Python standard library
-- Real market data is fetched from the Yahoo Finance chart endpoint
+- Real market data is fetched from the Yahoo Finance chart endpoint, with Stooq as a secondary source
 
 ## Roadmap
 
@@ -140,7 +142,7 @@ By default, the project uses only real daily market data. If real quotes cannot 
 
 - The repository is public and open to suggestions, issues, and pull requests
 - The local database, logs, and secrets are intentionally excluded from Git tracking
-- When real Yahoo Finance data is unavailable, the default behavior is to fail rather than hide the problem
+- When real market data is unavailable from the configured sources, the default behavior is to fail rather than hide the problem
 
 ## License
 

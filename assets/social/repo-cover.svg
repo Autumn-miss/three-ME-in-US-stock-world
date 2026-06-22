@@ -1,6 +1,6 @@
 <svg width="1280" height="640" viewBox="0 0 1280 640" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
   <title id="title">Virtual US Stock World cover</title>
-  <desc id="desc">A bold share cover for a local-first virtual US stock investing simulator with three personas and AI-sector tracking.</desc>
+  <desc id="desc">A bold share cover for an explainable US stock simulation with three investing personas, daily updates, and AI-sector tracking.</desc>
   <defs>
     <linearGradient id="bg" x1="112" y1="64" x2="1158" y2="602" gradientUnits="userSpaceOnUse">
       <stop stop-color="#F7F3E8"/>
@@ -40,10 +40,10 @@
     Virtual US Stock World
   </text>
   <text x="96" y="222" fill="#46525E" font-size="25" font-family="'Trebuchet MS', Verdana, sans-serif">
-    A local-first investing simulator with three personas,
+    Three investing personas. One market.
   </text>
   <text x="96" y="258" fill="#46525E" font-size="25" font-family="'Trebuchet MS', Verdana, sans-serif">
-    daily market updates, AI-sector tracking, and Streamlit dashboards.
+    A daily-updated simulation with AI-sector tracking.
   </text>
 
   <g>
